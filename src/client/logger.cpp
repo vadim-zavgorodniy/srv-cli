@@ -37,12 +37,16 @@ namespace warmouse {
   {
     closeFile();
 
-    m_file = fopen(file_name.c_str(), "a+");
-    if (!m_file)
+    if (!file_name.empty())
     {
-      error(0, errno, msg_log_init_error, file_name.c_str());
-      return false;
+      m_file = fopen(file_name.c_str(), "a+");
+      if (!m_file)
+      {
+        error(0, errno, msg_log_init_error, file_name.c_str());
+        return false;
+      }
     }
+
     m_use_lock = use_lock;
     return true;
   }
