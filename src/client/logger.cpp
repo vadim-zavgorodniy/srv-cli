@@ -2,6 +2,7 @@
 
 #include <error.h>
 #include <errno.h>
+#include <string.h>
 #include <unistd.h>
 #include <stdexcept>
 #include <sys/file.h>
@@ -10,7 +11,24 @@ namespace warmouse {
 
 //==============================================================================
   const char* const msg_log_init_error = "Ошибка открытия файла протокола \"%s\"";
-  const char* const msg_set_lock_error = "Ошибка блокировки файла протокола.";
+  const char* const msg_set_lock_error = "Ошибка блокировки файла протокола \"%s\"";
+
+//==============================================================================
+// Class 4 locking the provided file
+//==============================================================================
+  class FileLock
+  {
+  public:
+    FileLock(FILE* file);
+    ~FileLock();
+
+    void lock();
+    void unlock();
+
+  private:
+    FILE* m_file;
+    bool m_locked;
+  };
 
 //==============================================================================
 // Logger methods
@@ -75,22 +93,20 @@ namespace warmouse {
   }
 
 //------------------------------------------------------------------------------
-  bool FileLock::lock(bool do_throw, useconds_t timeout)
+  void FileLock::lock()
   {
-    if (m_file && !m_locked) {
-      int time = timeout, step = 1, res;
-      while ( (0 != (res = flock(fileno(m_file), LOCK_EX)))
-              && (time > 0))
-      {
-        usleep(step);
-        time -= step;
-      }
-      if (0 == res)
+    if (m_file && !m_locked)
+    {
+      if (0 == flock(fileno(m_file), LOCK_EX || LOCK_NB))
         m_locked = true;
-      else if (do_throw)
-        throw std::runtime_error(msg_set_lock_error);
+      else
+      {
+        char buf[MAX_MESSAGE_SIZE];
+        snprintf(buf, MAX_MESSAGE_SIZE, msg_set_lock_error, strerror(errno));
+
+        throw std::runtime_error(buf);
+      }
     }
-    return m_locked;
   }
 
 //------------------------------------------------------------------------------

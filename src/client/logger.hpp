@@ -41,23 +41,6 @@ namespace warmouse {
   };
 
 //==============================================================================
-// Class 4 locking the provided file
-//==============================================================================
-  class FileLock
-  {
-  public:
-    FileLock(FILE* file);
-    ~FileLock();
-
-    bool lock(bool do_throw = false, useconds_t timeout = 2000);
-    void unlock();
-
-  private:
-    FILE* m_file;
-    bool m_locked;
-  };
-
-//==============================================================================
 #define LOG_MESSAGE(MESSAGE)                                          \
   warmouse::Logger::instance().log((MESSAGE), warmouse::Logger::INF)
 
