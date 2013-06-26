@@ -97,7 +97,7 @@ namespace warmouse {
   {
     if (m_file && !m_locked)
     {
-      if (0 == flock(fileno(m_file), LOCK_EX || LOCK_NB))
+      if (0 == flock(fileno(m_file), LOCK_EX))
         m_locked = true;
       else
       {
