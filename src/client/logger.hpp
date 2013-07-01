@@ -26,7 +26,7 @@ namespace warmouse {
     /*
       If file_name is empty it logs to stdout.
      */
-    bool initialize(const std::string& file_name = "", bool use_lock = true);
+    bool initialize(const std::string& file_name = std::string(), bool use_lock = true);
 
     void log(const std::string& message, LogLevelT level = INF) const;
 

@@ -14,7 +14,8 @@ int main (int argc, char* argv[])
 {
   int res = 0;
 
-  if (!warmouse::Logger::instance().initialize(log_file))
+//  if (!warmouse::Logger::instance().initialize(log_file))
+  if (!warmouse::Logger::instance().initialize())
     return 1;
 
   try {
