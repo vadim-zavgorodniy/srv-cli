@@ -1,12 +1,11 @@
 #include <libs/logger/logger.hpp>
-#include "client_app.hpp"
+#include "server_app.hpp"
 
 #include <stdexcept>
 
 //==============================================================================
 const char* const log_file = "../../project.log";
-const char* const host = "localhost";
-const char* const usage = "USAGE: client target_file";
+//const char* const usage = "USAGE: server";
 const int port = 7777;
 
 //==============================================================================
@@ -20,14 +19,14 @@ int main (int argc, char* argv[])
 
   try {
 
-    if (2 != argc)
-    {
-      LOG_ERROR(usage);
-      return 2;
-    }
+    // if (2 != argc)
+    // {
+    //   LOG_ERROR(usage);
+    //   return 2;
+    // }
 
-    ClientApp app(host, port);
-    app.run(argv[1]);
+    ServerApp app(port);
+    app.run();
 
     LOG_MESSAGE("Привет Warmouse!!!");
   }

@@ -1,10 +1,15 @@
 add_executable(client
-  logger.cpp
   client_app.cpp
   client_main.cpp
 )
 
+add_dependencies(client logger)
+
+set_target_properties(client PROPERTIES COMPILE_FLAGS
+  "-I../..")
+
 target_link_libraries(client
+  logger
   boost_system
   pthread
 )

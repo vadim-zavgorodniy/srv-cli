@@ -1,14 +1,11 @@
 #include "client_app.hpp"
-#include "logger.hpp"
+#include <libs/logger/logger.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <fstream>
-
-//==============================================================================
-#define MAX_LINE_SIZE 4096
 
 //==============================================================================
 const char* const msg_file_open_error      = "Ошибка открытия файла: \"%1%\"";
@@ -58,13 +55,13 @@ void ClientApp::run(const std::string& file_name)
         throw std::runtime_error(
           (boost::format(msg_file_read_error) % file_name).str());
 
-      LOG_MESSAGE(line);
-
       size_t sz = line.size();
-
+      LOG_MESSAGE((boost::format("%1%:%2%") % sz % line).str());
+      LOG_MESSAGE((boost::format("sizeof(sz):%1%") % sizeof(sz)).str());
       // Send Data command format: D size data
       boost::asio::write(sock, boost::asio::buffer("D"));
-      boost::asio::write(sock, boost::asio::buffer(&sz, sizeof(sz)));
+      boost::asio::write(sock, boost::asio::buffer(
+                           reinterpret_cast<char*>(&sz), sizeof(sz)));
       boost::asio::write(sock, boost::asio::buffer(line));
     }
 
