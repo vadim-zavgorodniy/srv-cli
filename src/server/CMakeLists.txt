@@ -6,7 +6,7 @@ add_executable(server
 add_dependencies(server logger)
 
 set_target_properties(server PROPERTIES COMPILE_FLAGS
-  "-I../..")
+  ${generic_compile_options})
 
 target_link_libraries(server
   logger

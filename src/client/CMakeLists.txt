@@ -6,7 +6,7 @@ add_executable(client
 add_dependencies(client logger)
 
 set_target_properties(client PROPERTIES COMPILE_FLAGS
-  "-I../..")
+  ${generic_compile_options})
 
 target_link_libraries(client
   logger
