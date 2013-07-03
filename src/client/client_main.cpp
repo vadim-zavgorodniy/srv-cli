@@ -1,4 +1,4 @@
-#include <libs/logger/logger.hpp>
+#include <logger/logger.hpp>
 #include "client_app.hpp"
 
 #include <stdexcept>

@@ -1,5 +1,5 @@
 #include "client_app.hpp"
-#include <libs/logger/logger.hpp>
+#include <logger/logger.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
