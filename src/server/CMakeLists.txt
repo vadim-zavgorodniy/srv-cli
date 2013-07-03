@@ -1,5 +1,3 @@
-include_directories("../../libs")
-
 add_executable(server
   server_app.cpp
   server_main.cpp

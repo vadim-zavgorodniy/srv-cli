@@ -1,5 +1,3 @@
-include_directories("../../libs")
-
 add_executable(client
   client_app.cpp
   client_main.cpp
