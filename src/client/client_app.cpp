@@ -65,7 +65,6 @@ void ClientApp::run(const std::string& file_name)
         continue;
 
       uint32_t sz = line.size();
-//      LOG_MESSAGE((boost::format("%1%:%2%") % sz % line).str());
 
       // send Data command format: D size data
       sz = htonl(sz);
