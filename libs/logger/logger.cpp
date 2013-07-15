@@ -68,7 +68,7 @@ namespace warmouse {
 
     char stime[80];
     time_t t = time(NULL);
-    strftime(stime, sizeof(stime), "%d.%m.%Y %T", gmtime(&t));
+    strftime(stime, sizeof(stime), "%d.%m.%Y %T", localtime(&t));
 
     char buf[MAX_MESSAGE_SIZE];
     snprintf(buf, MAX_MESSAGE_SIZE, "%s %s(%d) [%s]: %s", stime,
