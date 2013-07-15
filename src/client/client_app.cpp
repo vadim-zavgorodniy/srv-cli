@@ -23,7 +23,7 @@ const char* const msg_socket_connect_error = "Error connecting to \"%1%:%2%\": \
 using boost::asio::ip::tcp;
 
 //==============================================================================
-void ClientApp::run(const std::string& file_name)
+void ClientApp::run(const std::string& file_name) const
 {
   std::fstream fin;
   fin.open(file_name.c_str(), std::fstream::in);

@@ -12,14 +12,14 @@ const int port = 7777;
 //==============================================================================
 int main (int argc, char* argv[])
 {
-  int res = 0;
-
 #ifdef _DEBUG
   if (!warmouse::Logger::instance().initialize())
 #else
   if (!warmouse::Logger::instance().initialize(log_file))
 #endif
     return 1;
+
+  int res = 0;
 
   try
   {

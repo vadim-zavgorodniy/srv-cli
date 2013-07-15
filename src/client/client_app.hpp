@@ -10,7 +10,7 @@ public:
     m_host(host), m_port(port)
   { }
 
-  void run(const std::string& file_name);
+  void run(const std::string& file_name) const;
 private:
   std::string m_host;
   unsigned m_port;

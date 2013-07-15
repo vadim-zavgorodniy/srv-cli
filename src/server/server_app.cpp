@@ -28,13 +28,13 @@ const char* const msg_socket_connect_error  = "Error connecting to \"%1%:%2%\": 
 const char* const msg_socket_io_error       = "Socket input/output error: \"%1%\"";
 const char* const msg_fork_error            = "Filed to create child process: \"%1%\"";
 const char* const msg_set_sig_handler_error = "Filed to set SIGCHLD handler: \"%1%\"";
+const char* const msg_unknown_command       = "Protocol error! Unknown command: \"%1%\"";
 const char* const msg_proto_err_data        = "Protocol error! Not enough data.";
 const char* const msg_wrong_fields_count    = "Protocol error! Wrong fields count: %1%";
 const char* const msg_invalid_time_format   = "Protocol error! Invalid date/time format: %1%";
 const char* const msg_invalid_num_format    = "Protocol error! Invalid numeric format in record: %1%";
 const char* const msg_buffer_overflow       = "Protocol error! Data read error. Buffer overflow.";
 const char* const msg_division_by_zero      = "Arithmetic error! Division by zero.";
-const char* const msg_unknown_command       = "Unknown command: \"%1%\"";
 
 //==============================================================================
 
@@ -44,6 +44,7 @@ void on_sig_child(int not_used)
   while (0 < waitpid(-1, NULL, WNOHANG)) ;
 }
 
+//------------------------------------------------------------------------------
 bool setSigHandlers()
 {
   struct sigaction act;
@@ -56,7 +57,7 @@ bool setSigHandlers()
 }
 
 //------------------------------------------------------------------------------
-void ServerApp::run()
+void ServerApp::run() const
 {
   if (!setSigHandlers())
     throw std::runtime_error(
@@ -69,7 +70,7 @@ void ServerApp::run()
   {
     for (;;)
     {
-      boost::asio::ip::tcp::socket sock(io);
+      tcp::socket sock(io);
       acceptor.accept(sock);
 
       int pid;
@@ -80,9 +81,10 @@ void ServerApp::run()
 
       else if (pid > 0) /* parent process */
       {
-        LOG_DEBUG((boost::format("Spawned process pid(%1%)") % pid).str());
+        LOG_DEBUG((boost::format("Spawned process, pid(%1%)") % pid).str());
       }
-      else { /* child process */
+      else /* child process */
+      {
         processClient(sock);
         return;
       }
@@ -96,17 +98,17 @@ void ServerApp::run()
 }
 
 //------------------------------------------------------------------------------
-void ServerApp::processClient(boost::asio::ip::tcp::socket& sock) const
+void ServerApp::processClient(tcp::socket& sock) const
 {
-  char buf[MAX_READ_BUF_SIZE];
-  char bcmd = '\0';
   uint32_t count = 0;
-  RecordT max_rec;
-  memset(&max_rec, 0, sizeof(struct RecordT));
 
-  bool done = false;
   try
   {
+    char buf[MAX_READ_BUF_SIZE];
+    char bcmd = '\0';
+    RecordT max_rec;
+
+    bool done = false;
     while (!done)
     {
       // read command
@@ -161,7 +163,7 @@ void ServerApp::processClient(boost::asio::ip::tcp::socket& sock) const
 }
 
 //------------------------------------------------------------------------------
-RecordT ServerApp::parseRecord(const char* buf, const size_t len) const
+ServerApp::RecordT ServerApp::parseRecord(char* buf, const size_t len) const
 {
 // fixed format sample: 03.04.2011 22:14:45,42.323,15.01
   LOG_DEBUG((boost::format("Parsing: %1%") % buf).str());
@@ -174,7 +176,6 @@ RecordT ServerApp::parseRecord(const char* buf, const size_t len) const
     throw std::runtime_error((boost::format(msg_wrong_fields_count) % items.size()).str());
 
   RecordT rec;
-  memset(&rec, 0, sizeof(struct RecordT));
 
   if (NULL == strptime(items[0].c_str(), "%d.%m.%Y %T", &rec.tm))
     throw std::runtime_error((boost::format(msg_invalid_time_format) % items[0]).str());
@@ -191,7 +192,7 @@ RecordT ServerApp::parseRecord(const char* buf, const size_t len) const
 }
 
 //------------------------------------------------------------------------------
-size_t ServerApp::readCmdData(boost::asio::ip::tcp::socket& sock, char* buf, size_t size) const
+size_t ServerApp::readCmdData(tcp::socket& sock, char* buf, size_t size) const
 {
   // read message size
   uint32_t len;
@@ -207,7 +208,7 @@ size_t ServerApp::readCmdData(boost::asio::ip::tcp::socket& sock, char* buf, siz
 }
 
 //------------------------------------------------------------------------------
-size_t ServerApp::readData(boost::asio::ip::tcp::socket& sock, char* buf, size_t size) const
+size_t ServerApp::readData(tcp::socket& sock, char* buf, size_t size) const
 {
   boost::system::error_code error;
   const size_t rcount = boost::asio::read(sock, boost::asio::buffer(buf, size), error);
