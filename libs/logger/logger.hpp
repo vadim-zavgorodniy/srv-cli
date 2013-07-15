@@ -14,7 +14,7 @@ namespace warmouse {
   class Logger
   {
   public:
-    enum LogLevelT {INF, WAR, ERR};
+    enum LogLevelT {INF, WAR, ERR, DBG};
 
     // singleton
     static Logger& instance()
@@ -54,6 +54,15 @@ namespace warmouse {
 //------------------------------------------------------------------------------
 #define LOG_ERROR(MESSAGE)                                            \
   warmouse::Logger::instance().log((MESSAGE), warmouse::Logger::ERR)
+
+//------------------------------------------------------------------------------
+#ifdef _DEBUG
+#define LOG_DEBUG(MESSAGE)                                            \
+  warmouse::Logger::instance().log((MESSAGE), warmouse::Logger::DBG)
+#else
+#define LOG_DEBUG(MESSAGE)
+#endif
+
 //==============================================================================
 
 

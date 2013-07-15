@@ -10,8 +10,9 @@
 namespace warmouse {
 
 //==============================================================================
-  const char* const msg_log_init_error = "Ошибка открытия файла протокола \"%s\"";
-  const char* const msg_set_lock_error = "Ошибка блокировки файла протокола \"%s\"";
+  const char* const msg_log_init_error = "Log file open error \"%s\"";
+  const char* const msg_set_lock_error = "Log file lock error \"%s\"";
+  const char* const msg_write_error    = "Filed to write to log message: \"%s\"";
 
 //==============================================================================
 // Class 4 locking the provided file
@@ -60,19 +61,30 @@ namespace warmouse {
       case INF: slevel = "INF"; break;
       case WAR: slevel = "WAR"; break;
       case ERR: slevel = "ERR"; break;
+      case DBG: slevel = "DBG"; break;
       default:  slevel = "MSG";
     }
     FILE *file = (m_file) ? m_file : ::stdout;
 
+    char stime[80];
+    time_t t = time(NULL);
+    strftime(stime, sizeof(stime), "%d.%m.%Y %T", gmtime(&t));
+
     char buf[MAX_MESSAGE_SIZE];
-    snprintf(buf, MAX_MESSAGE_SIZE, "%s [%s]: %s",
-             program_invocation_short_name, slevel.c_str(), message.c_str());
+    snprintf(buf, MAX_MESSAGE_SIZE, "%s %s(%d) [%s]: %s", stime,
+             program_invocation_short_name, getpid(), slevel.c_str(), message.c_str());
 
     FileLock fl(file);
     if (m_use_lock)
       fl.lock();
 
-    fprintf(file, "%s\n", buf);
+    if (0 > fprintf(file, "%s\n", buf))
+    {
+      char err_buf[MAX_MESSAGE_SIZE];
+      snprintf(err_buf, MAX_MESSAGE_SIZE, msg_write_error, buf);
+
+      throw std::runtime_error(err_buf);
+    }
   }
 
 //------------------------------------------------------------------------------

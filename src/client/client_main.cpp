@@ -14,12 +14,15 @@ int main (int argc, char* argv[])
 {
   int res = 0;
 
-//  if (!warmouse::Logger::instance().initialize(log_file))
+#ifdef _DEBUG
   if (!warmouse::Logger::instance().initialize())
+#else
+  if (!warmouse::Logger::instance().initialize(log_file))
+#endif
     return 1;
 
-  try {
-
+  try
+  {
     if (2 != argc)
     {
       LOG_ERROR(usage);
@@ -28,8 +31,6 @@ int main (int argc, char* argv[])
 
     ClientApp app(host, port);
     app.run(argv[1]);
-
-    LOG_MESSAGE("Привет Warmouse!!!");
   }
   catch (const std::exception& e)
   {
