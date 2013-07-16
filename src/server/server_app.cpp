@@ -12,6 +12,7 @@
 
 // posix
 #include <time.h>
+#include <math.h>
 #include <sys/wait.h>
 
 //==============================================================================
@@ -34,7 +35,7 @@ const char* const msg_wrong_fields_count    = "Protocol error! Wrong fields coun
 const char* const msg_invalid_time_format   = "Protocol error! Invalid date/time format: %1%";
 const char* const msg_invalid_num_format    = "Protocol error! Invalid numeric format in record: %1%";
 const char* const msg_buffer_overflow       = "Protocol error! Data read error. Buffer overflow.";
-const char* const msg_division_by_zero      = "Arithmetic error! Division by zero.";
+const char* const msg_division_by_zero      = "Arithmetic error! Incorrect data.";
 
 //==============================================================================
 
@@ -143,13 +144,12 @@ void ServerApp::processClient(tcp::socket& sock) const
       }
     }
 
-    if (max_rec.num2 == 0)
+    if (fabs(max_rec.num2) < 1e-40)
       throw std::runtime_error(msg_division_by_zero);
 
     char b[80];
     strftime(b, sizeof(b), "%d.%m.%Y %T", &max_rec.tm);
     LOG_MESSAGE((boost::format("%1%: %2%") % b % (max_rec.num1 / max_rec.num2)).str());
-
 
     // send a response
     count = htonl(count);
